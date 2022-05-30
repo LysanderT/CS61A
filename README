@@ -1,1 +1,7 @@
-My Project 1
+My Solutions for CS61A(2020).
+
+Since I do not have a UCB email, I cannot test them online on okpy.org.
+But the Solutions have passed all local cases.
+
+# test locally:
+    python3 ok -q [question name or code] --local
