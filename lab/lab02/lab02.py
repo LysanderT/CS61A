@@ -1,4 +1,3 @@
-
 def lambda_curry2(func):
     """
     Returns a Curried version of a two-argument function FUNC.
@@ -15,8 +14,18 @@ def lambda_curry2(func):
     3
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    # one-line version
+    return lambda num1: lambda num2: func(num1, num2)
+    """ 
+    def inside1(num1):
 
+        def inside2(num2):
+            return func(num1, num2)
+
+        return inside2
+
+    return inside1  
+    """  # multi-line version
 
 
 def count_cond(condition):
@@ -48,6 +57,14 @@ def count_cond(condition):
     """
     "*** YOUR CODE HERE ***"
 
+    def conditional_count(N):
+        count = 0
+        for i in range(1, N + 1):
+            if condition(N, i):
+                count += 1
+        return count
+
+    return conditional_count
 
 
 def both_paths(sofar="S"):
@@ -63,6 +80,16 @@ def both_paths(sofar="S"):
     """
     "*** YOUR CODE HERE ***"
 
+    def up():
+        sofar1 = sofar + "U"
+        return both_paths(sofar1)
+
+    def down():
+        sofar2 = sofar + "D"
+        return both_paths(sofar2)
+
+    print(sofar)
+    return up, down
 
 
 def compose1(f, g):
@@ -82,6 +109,7 @@ def compose1(f, g):
     """
     return lambda x: f(g(x))
 
+
 def composite_identity(f, g):
     """
     Return a function with one parameter x that returns True if f(g(x)) is
@@ -97,7 +125,17 @@ def composite_identity(f, g):
     False
     """
     "*** YOUR CODE HERE ***"
+    # one line
+    return lambda x: compose1(f, g)(x) == compose1(g, f)(x)
+    """
+    def h(x):
+        if f(g(x)) == g(f(x)):
+            return True
+        else:
+            return False
 
+    return h
+    """
 
 
 def cycle(f1, f2, f3):
@@ -128,3 +166,21 @@ def cycle(f1, f2, f3):
     """
     "*** YOUR CODE HERE ***"
 
+    def n_mode(n):  # choose n
+
+        def h(x):
+            result = x
+            for i in range(1, n + 1):
+                func = i % 3
+                if func == 1:
+                    result = f1(result)
+                elif func == 2:
+                    result = f2(result)
+                else:  # func ==0
+                    result = f3(result)
+
+            return result
+
+        return h
+
+    return n_mode

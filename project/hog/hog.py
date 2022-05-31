@@ -1,5 +1,6 @@
 """CS 61A Presents The Game of Hog."""
 
+from cgi import test
 from dice import six_sided, four_sided, make_test_dice
 from ucb import main, trace, interact
 
@@ -318,6 +319,13 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+
+    def averaged_dice(*arg):
+        dice_results = [original_function(*arg) for _ in range(trials_count)]
+        return sum(dice_results) / trials_count
+
+    return averaged_dice
+
     # END PROBLEM 8
 
 
@@ -332,6 +340,15 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    test_func = make_averaged(roll_dice, trials_count)
+    global_optimal = 11  # can be any number > 10
+    global_max = 0
+    for local_optimal in range(10, 0, -1):
+        local_max = test_func(local_optimal, dice)
+        if local_max >= global_max:
+            global_optimal, global_max = local_optimal, local_max
+    return global_optimal
+
     # END PROBLEM 9
 
 
@@ -379,7 +396,7 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    return 0 if free_bacon(opponent_score) >= cutoff else num_rolls
     # END PROBLEM 10
 
 
@@ -389,7 +406,13 @@ def swap_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     non-beneficial swap. Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    if is_swap(score + free_bacon(opponent_score), opponent_score):
+        if (score + free_bacon(opponent_score) <= opponent_score):
+            return 0
+        else:
+            return num_rolls
+    else:
+        return bacon_strategy(score, opponent_score, cutoff, num_rolls)
     # END PROBLEM 11
 
 
@@ -399,7 +422,7 @@ def final_strategy(score, opponent_score):
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 6  # Replace this statement
+    return 6
     # END PROBLEM 12
 
 

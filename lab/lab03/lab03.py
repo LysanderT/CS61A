@@ -1,4 +1,4 @@
-HW_SOURCE_FILE=__file__
+HW_SOURCE_FILE = __file__
 
 
 def pascal(row, column):
@@ -12,13 +12,22 @@ def pascal(row, column):
     3
     """
     "*** YOUR CODE HERE ***"
+    if column < 0 or row < 0 or column > row:
+        return 0
+    elif column == 0 or column == row:
+        return 1
+    else:
+        return pascal(row - 1, column) + pascal(row - 1, column - 1)
 
 
 def compose1(f, g):
     """"Return a function h, such that h(x) = f(g(x))."""
+
     def h(x):
         return f(g(x))
+
     return h
+
 
 def repeated(f, n):
     """Return the function that computes the nth application of func (recursively!).
@@ -40,6 +49,11 @@ def repeated(f, n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n == 0:
+        return lambda x: x
+    else:
+        return lambda x: f(repeated(f, n - 1)(x))
+    # or return compose1(f, repeated(f, n - 1))
 
 
 def num_eights(x):
@@ -64,6 +78,19 @@ def num_eights(x):
     True
     """
     "*** YOUR CODE HERE ***"
+    if x == 0:
+        return 0
+    else:
+        return num_eights(x // 10) + (x % 10 == 8)
+    # True
+    """
+    >>> True == 1
+    True
+    >>> 1 + True
+    2
+    >>> 1 + False
+    1
+    """
 
 
 def pingpong(n):
@@ -100,3 +127,12 @@ def pingpong(n):
     """
     "*** YOUR CODE HERE ***"
 
+    def pingpong_helper(value, index, direction):
+        if index == n:
+            return value
+        if num_eights(index) != 0 or index % 8 == 0:  # flip the direction
+            return pingpong_helper(value - direction, index + 1, -direction)
+        else:
+            return pingpong_helper(value + direction, index + 1, direction)
+
+    return pingpong_helper(1, 1, 1)
