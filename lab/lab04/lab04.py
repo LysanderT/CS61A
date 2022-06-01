@@ -28,6 +28,8 @@ def reverse_recursive(lst):
     """
     "*** YOUR CODE HERE ***"
 
+    return [lst[-1]] + reverse_recursive(lst[:-1]) if lst else []
+
 
 from math import sqrt
 
@@ -44,6 +46,9 @@ def distance(city_a, city_b):
     5.0
     """
     "*** YOUR CODE HERE ***"
+    dx = get_lat(city_a) - get_lat(city_b)
+    dy = get_lon(city_a) - get_lon(city_b)
+    return sqrt(dx**2 + dy**2)
 
 
 def closer_city(lat, lon, city_a, city_b):
@@ -61,6 +66,9 @@ def closer_city(lat, lon, city_a, city_b):
     'Bucharest'
     """
     "*** YOUR CODE HERE ***"
+    new = make_city('new', lat, lon)
+    return get_name(city_a) if distance(new, city_a) <= distance(
+        new, city_b) else get_name(city_b)
 
 
 def check_abstraction():
@@ -176,3 +184,9 @@ def add_chars(w1, w2):
     True
     """
     "*** YOUR CODE HERE ***"
+    if len(w1) == 0:
+        return w2
+    if w1[0] == w2[0]:
+        return add_chars(w1[1:], w2[1:])
+    else:
+        return w2[0] + add_chars(w1, w2[1:])

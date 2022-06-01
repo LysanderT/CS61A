@@ -1,4 +1,6 @@
-HW_SOURCE_FILE=__file__
+from shutil import move
+
+HW_SOURCE_FILE = __file__
 
 
 def composer(func=lambda x: x):
@@ -19,8 +21,13 @@ def composer(func=lambda x: x):
     >>> f3(3) # should be 1 + (2 * (3 + 1)) = 9
     9
     """
+
+    # a very good problem
     def func_adder(g):
         "*** YOUR CODE HERE ***"
+        h = lambda x: func(g(x))
+        return composer(h)
+
     return func, func_adder
 
 
@@ -43,6 +50,11 @@ def g(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n <= 3:
+        return n
+    else:
+        return g(n - 1) + 2 * g(n - 2) + 3 * g(n - 3)
+
 
 def g_iter(n):
     """Return the value of G(n), computed iteratively.
@@ -63,6 +75,12 @@ def g_iter(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n <= 3:
+        return n
+    g1, g2, g3 = 1, 2, 3
+    for _ in range(4, n + 1):
+        g1, g2, g3 = g2, g3, 3 * g1 + 2 * g2 + g3
+    return g3
 
 
 def missing_digits(n):
@@ -93,6 +111,12 @@ def missing_digits(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    last, all_but_last = n % 10, n // 10
+    if all_but_last == 0:
+        return 0
+    else:
+        diff = max(last - all_but_last % 10 - 1, 0)
+        return missing_digits(all_but_last) + diff
 
 
 def count_change(total):
@@ -113,10 +137,37 @@ def count_change(total):
     """
     "*** YOUR CODE HERE ***"
 
+    def count_helper(n, m):
+        if n == 0:
+            return 1
+        if n < 0:
+            return 0
+        if m == 1:
+            return 1
+        if n < m:
+            return count_helper(n, m / 2)
+        else:
+            return count_helper(n, m / 2) + count_helper(n - m, m)
+
+    from math import log2
+    max_cent = 2**int(log2(total))  # the max denomination of coins
+    return count_helper(total, max_cent)
+    """
+        def helper(n, m):
+        if n == 0:
+            return 1
+        elif n < (1 << m):
+            return 0
+        else:
+            return helper(n, m + 1) + helper(n - (1 << m), m)
+    return helper(total, 0)
+    """
+
 
 def print_move(origin, destination):
     """Print instructions to move a disk."""
     print("Move the top disk from rod", origin, "to rod", destination)
+
 
 def move_stack(n, start, end):
     """Print the moves required to move n disks on the start pole to the end
@@ -147,9 +198,17 @@ def move_stack(n, start, end):
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
+    if n == 1:
+        print_move(start, end)
+    else:
+        other = 6 - start - end
+        move_stack(n - 1, start, other)
+        move_stack(1, start, end)
+        move_stack(n - 1, other, end)
 
 
 from operator import sub, mul
+
 
 def make_anonymous_factorial():
     """Return the value of an expression that computes factorial.
@@ -161,5 +220,6 @@ def make_anonymous_factorial():
     >>> check(HW_SOURCE_FILE, 'make_anonymous_factorial', ['Assign', 'AugAssign', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
-
+    from functools import reduce
+    return lambda x: reduce(mul, [i for i in range(1, x + 1)])
+    # return lambda x: reduce(mul, range(x+1))
