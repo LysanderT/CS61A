@@ -363,8 +363,3 @@ def copy_tree(t):
     5
     """
     return tree(label(t), [copy_tree(b) for b in branches(t)])
-
-
-t1 = tree(1, [tree(2), tree(3)])
-new1 = sprout_leaves(t1, [4, 5])
-print_tree(new1)

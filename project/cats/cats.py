@@ -4,7 +4,6 @@ from utils import *
 from ucb import main, interact, trace
 from datetime import datetime
 
-
 ###########
 # Phase 1 #
 ###########
@@ -17,6 +16,12 @@ def choose(paragraphs, select, k):
     """
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    for paragraph in paragraphs:
+        if select(paragraph):
+            k -= 1
+        if k == -1:
+            return paragraph
+    return ''
     # END PROBLEM 1
 
 
@@ -33,6 +38,21 @@ def about(topic):
     assert all([lower(x) == x for x in topic]), 'topics should be lowercase.'
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+
+    def topic_select(para):
+        # remove punctuation from string
+        punc = '$#@&*"-+<>=()\'_!.'
+        for ch in para:
+            if ch in punc:
+                para = para.replace(ch, '')
+        para = para.lower().split()
+
+        for t in topic:
+            if t in para:
+                return True
+        return False
+
+    return topic_select
     # END PROBLEM 2
 
 
@@ -57,6 +77,17 @@ def accuracy(typed, reference):
     reference_words = split(reference)
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    typed_words = [word.replace('\t', '') for word in typed_words]  # for tabs.
+
+    correct = 0
+    test_lst = list(zip(typed_words, reference_words))
+    for pair in test_lst:
+        if pair[0] == pair[1]:
+            correct += 1
+    if not typed_words:
+        return 0.0
+    return 100 * correct / len(typed_words)
+
     # END PROBLEM 3
 
 
@@ -65,6 +96,7 @@ def wpm(typed, elapsed):
     assert elapsed > 0, 'Elapsed time must be positive'
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    return 12 * len(typed) / elapsed  # 12 = 1/(5/60)
     # END PROBLEM 4
 
 
@@ -75,6 +107,14 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     """
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    if user_word in valid_words:
+        return user_word
+    min_diff = float("inf")
+    similar_word = min(valid_words,
+                       key=lambda x: diff_function(user_word, x, limit))
+    if diff_function(user_word, similar_word, limit) > limit:
+        return user_word
+    return similar_word
     # END PROBLEM 5
 
 
@@ -84,28 +124,50 @@ def shifty_shifts(start, goal, limit):
     their lengths.
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    if not start:
+        return len(goal)
+    if not goal:
+        return len(start)
+    if start == goal:
+        return 0
+    if limit == 0:
+        return 1
+    judge = (start[0] != goal[0])
+    return judge + shifty_shifts(start[1:], goal[1:], limit - judge)
+
     # END PROBLEM 6
 
 
 def meowstake_matches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False, 'Remove this line'
+    assert False
+    if start == goal:
+        return 0
+    if limit == 0:
+        return 1
+    if not goal:
+        return len(start)
+    if not start:
+        return len(goal)
 
-    if ______________: # Fill in the condition
+    if set([x for x in start]) == set([x for x in goal
+                                       ]):  # Fill in the condition
         # BEGIN
         "*** YOUR CODE HERE ***"
+        pass
+
         # END
 
-    elif ___________: # Feel free to remove or add additional cases
+    elif 0:  # Feel free to remove or add additional cases
         # BEGIN
         "*** YOUR CODE HERE ***"
+
         # END
 
     else:
         add_diff = ...  # Fill in these lines
-        remove_diff = ... 
-        substitute_diff = ... 
+        remove_diff = ...
+        substitute_diff = ...
         # BEGIN
         "*** YOUR CODE HERE ***"
         # END
@@ -125,6 +187,15 @@ def report_progress(typed, prompt, id, send):
     """Send a report of your id and progress so far to the multiplayer server."""
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    num = 0
+    for i in range(len(typed)):
+        if typed[i] == prompt[i]:
+            num += 1
+        else:
+            break
+    ratio = num / len(prompt)
+    send({'id': id, 'progress': ratio})
+    return ratio
     # END PROBLEM 8
 
 
@@ -151,6 +222,11 @@ def time_per_word(times_per_player, words):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    time_0 = []
+    player_0 = times_per_player[0]
+    for i in range(len(player_0) - 1):
+        time_0.append(player_0[i + 1] - player_0[i])
+
     # END PROBLEM 9
 
 
@@ -163,7 +239,7 @@ def fastest_words(game):
         a list of lists containing which words each player typed fastest
     """
     players = range(len(all_times(game)))  # An index for each player
-    words = range(len(all_words(game)))    # An index for each word
+    words = range(len(all_words(game)))  # An index for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
     # END PROBLEM 10
@@ -171,10 +247,14 @@ def fastest_words(game):
 
 def game(words, times):
     """A data abstraction containing all words typed and their times."""
-    assert all([type(w) == str for w in words]), 'words should be a list of strings'
-    assert all([type(t) == list for t in times]), 'times should be a list of lists'
-    assert all([isinstance(i, (int, float)) for t in times for i in t]), 'times lists should contain numbers'
-    assert all([len(t) == len(words) for t in times]), 'There should be one word per time.'
+    assert all([type(w) == str
+                for w in words]), 'words should be a list of strings'
+    assert all([type(t) == list
+                for t in times]), 'times should be a list of lists'
+    assert all([isinstance(i, (int, float)) for t in times
+                for i in t]), 'times lists should contain numbers'
+    assert all([len(t) == len(words)
+                for t in times]), 'There should be one word per time.'
     return [words, times]
 
 
@@ -205,6 +285,7 @@ def game_string(game):
     """A helper function that takes in a game object and returns a string representation of it"""
     return "game(%s, %s)" % (game[0], game[1])
 
+
 enable_multiplayer = False  # Change to True when you
 
 ##########################
@@ -212,26 +293,32 @@ enable_multiplayer = False  # Change to True when you
 ##########################
 
 key_distance = get_key_distances()
+
+
 def key_distance_diff(start, goal, limit):
     """ A diff function that takes into account the distances between keys when
     computing the difference score."""
 
-    start = start.lower() #converts the string to lowercase
-    goal = goal.lower() #converts the string to lowercase
+    start = start.lower()  #converts the string to lowercase
+    goal = goal.lower()  #converts the string to lowercase
 
     # BEGIN PROBLEM EC1
     "*** YOUR CODE HERE ***"
     # END PROBLEM EC1
 
+
 def memo(f):
     """A memoization function as seen in John Denero's lecture on Growth"""
 
     cache = {}
+
     def memoized(*args):
         if args not in cache:
             cache[args] = f(*args)
         return cache[args]
+
     return memoized
+
 
 key_distance_diff = count(key_distance_diff)
 
@@ -262,7 +349,9 @@ def run_typing_test(topics):
             print('No more paragraphs about', topics, 'are available.')
             return
         print('Type the following paragraph and then press enter/return.')
-        print('If you only type part of it, you will be scored only on that part.\n')
+        print(
+            'If you only type part of it, you will be scored only on that part.\n'
+        )
         print(reference)
         print()
 
