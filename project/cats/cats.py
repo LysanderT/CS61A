@@ -109,7 +109,6 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     "*** YOUR CODE HERE ***"
     if user_word in valid_words:
         return user_word
-    min_diff = float("inf")
     similar_word = min(valid_words,
                        key=lambda x: diff_function(user_word, x, limit))
     if diff_function(user_word, similar_word, limit) > limit:
@@ -140,36 +139,34 @@ def shifty_shifts(start, goal, limit):
 
 def meowstake_matches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False
-    if start == goal:
+
+    if limit < 0:  # Fill in the condition
+        # BEGIN
+        "*** YOUR CODE HERE ***"
         return 0
-    if limit == 0:
-        return 1
-    if not goal:
-        return len(start)
-    if not start:
-        return len(goal)
-
-    if set([x for x in start]) == set([x for x in goal
-                                       ]):  # Fill in the condition
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        pass
 
         # END
 
-    elif 0:  # Feel free to remove or add additional cases
+    elif len(start) == 0 or len(
+            goal) == 0:  # Feel free to remove or add additional cases
+
         # BEGIN
         "*** YOUR CODE HERE ***"
-
+        return len(start) + len(goal)
         # END
+    elif start[0] == goal[0]:
+        return meowstake_matches(start[1:], goal[1:], limit)
 
     else:
-        add_diff = ...  # Fill in these lines
-        remove_diff = ...
-        substitute_diff = ...
+        add_diff = meowstake_matches(start, goal[1:],
+                                     limit - 1)  # Fill in these lines
+        # 指这一步为add，之后所需的diff。remove和substitude同理
+        remove_diff = meowstake_matches(start[1:], goal, limit - 1)
+        substitute_diff = meowstake_matches(start[1:], goal[1:], limit - 1)
+
         # BEGIN
         "*** YOUR CODE HERE ***"
+        return 1 + min(add_diff, remove_diff, substitute_diff)
         # END
 
 
@@ -222,10 +219,14 @@ def time_per_word(times_per_player, words):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
-    time_0 = []
-    player_0 = times_per_player[0]
-    for i in range(len(player_0) - 1):
-        time_0.append(player_0[i + 1] - player_0[i])
+    times = []
+    for i in range(len(times_per_player)):
+        atime = []
+        player = times_per_player[i]
+        for i in range(len(player) - 1):
+            atime.append(player[i + 1] - player[i])
+        times.append(atime)
+    return game(words, times)
 
     # END PROBLEM 9
 
@@ -242,6 +243,20 @@ def fastest_words(game):
     words = range(len(all_words(game)))  # An index for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
+    words = all_words(game)
+    times = all_times(game)
+    fastest = [[] for _ in range(len(times))]
+    for word_index in range(len(words)):
+        min_time = float('inf')
+        for player_index in range(len(times)):
+            atime = time(game, player_index, word_index)
+            if atime < min_time:
+                min_time = atime
+                fast_player = player_index
+        word = words[word_index]
+        fastest[fast_player].append(word)
+    return fastest
+
     # END PROBLEM 10
 
 
@@ -303,7 +318,20 @@ def key_distance_diff(start, goal, limit):
     goal = goal.lower()  #converts the string to lowercase
 
     # BEGIN PROBLEM EC1
-    "*** YOUR CODE HERE ***"
+    if limit < 0:
+        return float('inf')
+    elif len(start) == 0 or len(goal) == 0:
+        return len(start) + len(goal)
+    elif start[0] == goal[0]:
+        return key_distance_diff(start[1:], goal[1:], limit)
+    else:
+        add_diff = 1 + key_distance_diff(start, goal[1:], limit - 1)
+        remove_diff = 1 + key_distance_diff(start[1:], goal, limit - 1)
+        k = key_distance[(start[0], goal[0])]
+        substitute_diff = k + key_distance_diff(start[1:], goal[1:], limit - 1)
+
+        return min(add_diff, remove_diff, substitute_diff)
+
     # END PROBLEM EC1
 
 
@@ -328,6 +356,21 @@ def faster_autocorrect(user_word, valid_words, diff_function, limit):
 
     # BEGIN PROBLEM EC2
     "*** YOUR CODE HERE ***"
+    past_words = {}
+    if user_word in past_words:
+        return past_words[user_word]
+
+    if user_word in valid_words:
+        past_words[user_word] = user_word
+        return user_word
+    similar_word = min(valid_words,
+                       key=lambda x: diff_function(user_word, x, limit))
+    if diff_function(user_word, similar_word, limit) > limit:
+        past_words[user_word] = user_word
+        return user_word
+    else:
+        past_words[user_word] = similar_word
+        return similar_word
     # END PROBLEM EC2
 
 
