@@ -1,3 +1,6 @@
+from audioop import reverse
+
+
 def convert_link(link):
     """Takes a linked list and returns a Python list with the same elements.
 
@@ -8,6 +11,17 @@ def convert_link(link):
     []
     """
     "*** YOUR CODE HERE ***"
+    # recursion version
+    if link is Link.empty:
+        return []
+    return [link.first] + convert_link(link.rest)
+
+    # iteration version
+    #py_lst = []
+    #while link is not Link.empty:
+    #    py_lst.append(link.first)
+    #    link = link.rest
+    #return py_lst
 
 
 def every_other(s):
@@ -28,6 +42,12 @@ def every_other(s):
     Link(4)
     """
     "*** YOUR CODE HERE ***"
+    if hasattr(s, 'rest') and hasattr(s.rest, 'rest'):
+        if s.rest.rest is not Link.empty:
+            s.rest = s.rest.rest
+            every_other(s.rest)
+        else:
+            s.rest = Link.empty
 
 
 def label_squarer(t):
@@ -39,6 +59,7 @@ def label_squarer(t):
     Tree(1, [Tree(9, [Tree(25)]), Tree(49)])
     """
     "*** YOUR CODE HERE ***"
+    t.map(lambda x: x**2)
 
 
 def cumulative_mul(t):
@@ -51,6 +72,9 @@ def cumulative_mul(t):
     Tree(105, [Tree(15, [Tree(5)]), Tree(7)])
     """
     "*** YOUR CODE HERE ***"
+    for sub_tree in t.branches:
+        cumulative_mul(sub_tree)
+        t.label *= (sub_tree.label)
 
 
 def has_cycle(link):
@@ -68,6 +92,15 @@ def has_cycle(link):
     False
     """
     "*** YOUR CODE HERE ***"
+    s = link
+    nodes = []
+    while hasattr(s, 'rest'):
+        if s in nodes:
+            return True
+        nodes.append(s)
+        s = s.rest
+    return False
+
 
 def has_cycle_constant(link):
     """Return whether link contains a cycle.
@@ -81,6 +114,12 @@ def has_cycle_constant(link):
     False
     """
     "*** YOUR CODE HERE ***"
+    s = link
+    while hasattr(s, 'rest'):
+        if s.rest is link:
+            return True
+        s = s.rest
+    return False
 
 
 def reverse_other(t):
@@ -97,6 +136,15 @@ def reverse_other(t):
     Tree(1, [Tree(8, [Tree(3, [Tree(5), Tree(4)]), Tree(6, [Tree(7)])]), Tree(2)])
     """
     "*** YOUR CODE HERE ***"
+    labels = [tree.label for tree in t.branches]
+    labels.reverse()
+
+    i = 0
+    for tree in t.branches:
+        tree.label = labels[i]
+        i += 1
+        for sub_tree in tree.branches:
+            reverse_other(sub_tree)
 
 
 class Link:
@@ -151,6 +199,7 @@ class Tree:
     >>> t.branches[1].is_leaf()
     True
     """
+
     def __init__(self, label, branches=[]):
         for b in branches:
             assert isinstance(b, Tree)
@@ -208,10 +257,11 @@ class Tree:
         return 'Tree({0}{1})'.format(self.label, branch_str)
 
     def __str__(self):
+
         def print_tree(t, indent=0):
             tree_str = '  ' * indent + str(t.label) + "\n"
             for b in t.branches:
                 tree_str += print_tree(b, indent + 1)
             return tree_str
-        return print_tree(self).rstrip()
 
+        return print_tree(self).rstrip()
